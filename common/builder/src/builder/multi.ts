@@ -69,16 +69,16 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
     // Ignore created statuses
     const statuses = this.compilerStatuses().filter((status) => status !== 'created');
 
-    const statusesWithoutClosed = statuses.filter((status) => status === 'closed');
+    const statusesWithoutClosed = statuses.filter((status) => status !== 'closed');
     // All compilers are closed
-    if (statusesWithoutClosed.length === statuses.length) {
+    if (statusesWithoutClosed.length === 0) {
       this.emit('closed');
       return;
     }
 
-    const statusesWithoutDone = statuses.filter((status) => status === 'done');
+    const statusesWithDone = statusesWithoutClosed.filter((status) => status === 'done');
     // All compilers are done
-    if (statusesWithoutDone.length === statuses.length) {
+    if (statusesWithDone.length === statusesWithoutClosed.length) {
       this.emit('done');
       return;
     }
