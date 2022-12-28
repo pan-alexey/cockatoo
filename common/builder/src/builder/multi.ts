@@ -31,7 +31,7 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
     this.listenCompilers();
   }
 
-  private listenCompilers = () => {
+  private listenCompilers() {
     const names = Object.keys(this.compilers) as unknown as Array<keyof Compilers>;
     names.forEach((name: keyof Compilers) => {
       const compiler = this.compilers[name];
@@ -46,10 +46,10 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
           this.processing();
         });
     });
-  };
+  }
 
   // get state of compilers (call compiler.getState())
-  private compilerStates = (): { [Names in keyof Compilers]: CompilerState } => {
+  private compilerStates(): { [Names in keyof Compilers]: CompilerState } {
     const compilers = this.compilers;
     const names = Object.keys(compilers) as unknown as Array<keyof Compilers>;
 
@@ -57,15 +57,15 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
       acc[name] = compilers[name].getState();
       return acc;
     }, {} as { [Names in keyof Compilers]: CompilerState });
-  };
+  }
 
-  private compilerStatuses = (): BuilderStatus[] => {
+  private compilerStatuses(): BuilderStatus[] {
     const states = this.compilerStates();
     const names = Object.keys(states) as unknown as Array<keyof Compilers>;
     return names.map((name) => states[name].status);
-  };
+  }
 
-  public processing = (): void => {
+  public processing(): void {
     // Ignore created statuses
     const statuses = this.compilerStatuses().filter((status) => status !== 'created');
 
@@ -90,28 +90,28 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
     }
 
     this.emit('progress');
-  };
+  }
 
-  private emit = (status: BuilderEvents): void => {
+  private emit(status: BuilderEvents): void {
     this.status = status;
     this.callbacks[status].forEach((fn) => fn(this.status, this.compilerStates()));
-  };
+  }
 
-  public on = (
+  public on(
     event: BuilderEvents,
     fn: (status: BuilderStatus, states: { [Names in keyof Compilers]: CompilerState }) => void,
-  ): void => {
+  ): void {
     this.callbacks[event].push(fn);
-  };
+  }
 
-  public run = (): void => {
+  public run(): void {
     const names = Object.keys(this.compilers) as unknown as Array<keyof Compilers>;
     names.forEach((name: keyof Compilers) => {
       this.compilers[name].run();
     });
-  };
+  }
 
-  public close = (callback?: (states: { [Names in keyof Compilers]: CompilerState }) => void): void => {
+  public close(callback?: (states: { [Names in keyof Compilers]: CompilerState }) => void): void {
     if (!callback) {
       return;
     }
@@ -124,5 +124,5 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
     Promise.all(promises).then(() => {
       callback(this.compilerStates());
     });
-  };
+  }
 }

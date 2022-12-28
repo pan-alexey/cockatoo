@@ -13,7 +13,7 @@ export class BaseBuilder extends BaseCompiler {
   };
 
   public close = (callback?: CompilerCallback): void => {
-    super.compiler.close(() => {
+    this.compiler.close(() => {
       this.closeHandle();
       if (callback) {
         callback(this.state);

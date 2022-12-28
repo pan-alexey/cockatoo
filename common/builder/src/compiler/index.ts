@@ -14,15 +14,6 @@ export type CompilerState = {
 
 export type CompilerCallback = (state: CompilerState) => void;
 
-const getDefaultProgress = (): ProgressState => {
-  return {
-    progress: 0,
-    status: 'created',
-    buildTime: 0,
-    message: '',
-  };
-};
-
 export abstract class BaseCompiler {
   protected compiler: webpack.Compiler;
 
@@ -30,7 +21,12 @@ export abstract class BaseCompiler {
     status: 'created',
     stats: null,
     err: null,
-    progress: getDefaultProgress(),
+    progress: {
+      progress: 0,
+      status: 'created',
+      buildTime: 0,
+      message: '',
+    },
   };
 
   private callbacks: {
@@ -47,20 +43,20 @@ export abstract class BaseCompiler {
     this.listenCompiler();
   }
 
-  public getState = (): CompilerState => {
+  public getState(): CompilerState {
     return this.state;
-  };
+  }
 
-  public on = (name: CompilerEvents, callback: CompilerCallback): BaseCompiler => {
+  public on(name: CompilerEvents, callback: CompilerCallback): BaseCompiler {
     this.callbacks[name].push(callback);
     return this;
-  };
+  }
 
   abstract run(): void;
 
   abstract close(callback?: CompilerCallback): void;
 
-  private listenCompiler = () => {
+  private listenCompiler() {
     compilerProgress(this.compiler, (progressState) => {
       // Save progress state
       this.state.progress = progressState;
@@ -81,19 +77,19 @@ export abstract class BaseCompiler {
           break;
       }
     });
-  };
+  }
 
-  protected compilerHandler = (err: Error | null = null, stats: webpack.Stats | null = null): void => {
+  protected compilerHandler(err: Error | null = null, stats: webpack.Stats | null = null): void {
     this.state.stats = stats;
     this.state.err = err;
     this.emitDone();
-  };
+  }
 
-  protected closeHandle = () => {
+  protected closeHandle(): void {
     this.emitClose();
-  };
+  }
 
-  private emitStart = (): void => {
+  private emitStart(): void {
     // Reset stats
     this.state.status = 'start';
     this.state.stats = null;
@@ -101,25 +97,25 @@ export abstract class BaseCompiler {
 
     // emit start callbacks
     this.callbacks.start.forEach((fn) => fn(this.state));
-  };
+  }
 
-  private emitProgress = (): void => {
+  private emitProgress(): void {
     this.state.status = 'progress';
 
     // emit progress callbacks
     this.callbacks.progress.forEach((fn) => fn(this.state));
-  };
+  }
 
-  private emitDone = (): void => {
+  private emitDone(): void {
     if ((this.state.stats || this.state.err) && this.state.progress.status === 'done') {
       this.state.status = 'done';
 
       // emit done callbacks
       this.callbacks.done.forEach((fn) => fn(this.state));
     }
-  };
+  }
 
-  private emitClose = (): void => {
+  private emitClose(): void {
     this.state.stats = null;
     this.state.status = 'closed';
     this.state.err = null;
@@ -132,5 +128,5 @@ export abstract class BaseCompiler {
 
     // emit closed callbacks
     this.callbacks.closed.forEach((fn) => fn(this.state));
-  };
+  }
 }
