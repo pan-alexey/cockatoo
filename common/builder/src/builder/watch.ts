@@ -21,16 +21,16 @@ export class WatchBuilder extends BaseCompiler {
       },
       watchOption || {},
     );
-    super.compiler.watch(options, (err, stats) => {
-      super.compilerHandler(err, stats);
+    this.compiler.watch(options, (err, stats) => {
+      this.compilerHandler(err, stats);
     });
   };
 
   public close = (callback?: CompilerCallback): void => {
-    super.compiler.watching.close(() => {
-      super.closeHandle();
+    this.compiler.watching.close(() => {
+      this.closeHandle();
       if (callback) {
-        callback(super.state);
+        callback(this.state);
       }
     });
   };

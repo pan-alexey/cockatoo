@@ -8,13 +8,13 @@ export class BaseBuilder extends BaseCompiler {
 
   public run = (): void => {
     super.compiler.run((err, stats) => {
-      super.compilerHandler(err, stats);
+      this.compilerHandler(err, stats);
     });
   };
 
   public close = (callback?: CompilerCallback): void => {
     super.compiler.close(() => {
-      super.closeHandle();
+      this.closeHandle();
       if (callback) {
         callback(this.state);
       }
