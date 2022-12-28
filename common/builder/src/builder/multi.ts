@@ -1,7 +1,4 @@
-import webpack from 'webpack';
 import { BaseCompiler, CompilerState } from '../compiler';
-import { WatchBuilder } from './watch';
-import { BaseBuilder } from './build';
 
 export type MultiBuilderState = {
   status: BuilderStatus;
@@ -95,7 +92,7 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
     this.emit('progress');
   };
 
-  private emit = (status: BuilderStatus): void => {
+  private emit = (status: BuilderEvents): void => {
     this.status = status;
     this.callbacks[status].forEach((fn) => fn(this.status, this.compilerStates()));
   };
