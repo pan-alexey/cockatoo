@@ -13,7 +13,7 @@ export class WatchBuilder extends BaseCompiler {
     super(compiler);
   }
 
-  public run = (watchOption?: WatchOptions): void => {
+  public run(watchOption?: WatchOptions): void {
     const options: WatchOptions = Object.assign(
       {
         aggregateTimeout: 10,
@@ -21,14 +21,14 @@ export class WatchBuilder extends BaseCompiler {
       },
       watchOption || {},
     );
-    this.compiler.watch(options, (err, stats) => {
-      this.compilerHandler(err, stats);
+    super.compiler.watch(options, (err, stats) => {
+      super.compilerHandler(err, stats);
     });
   };
 
-  public close = (callback?: CompilerCallback): void => {
-    this.compiler.watching.close(() => {
-      this.closeHandle();
+  public close(callback?: CompilerCallback): void {
+    super.compiler.watching.close(() => {
+      super.closeHandle();
       if (callback) {
         callback(this.state);
       }
