@@ -49,7 +49,7 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
   }
 
   // get state of compilers (call compiler.getState())
-  private compilerStates(): { [Names in keyof Compilers]: CompilerState } {
+  private mapCompilerStates(): { [Names in keyof Compilers]: CompilerState } {
     const names = Object.keys(this.compilers) as unknown as Array<keyof Compilers>;
 
     return names.reduce<{ [Names in keyof Compilers]: CompilerState }>((acc, name) => {
@@ -58,15 +58,15 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
     }, {} as { [Names in keyof Compilers]: CompilerState });
   }
 
-  private compilerStatuses(): BuilderStatus[] {
-    const states = this.compilerStates();
+  private mapCompilerStatuses(): BuilderStatus[] {
+    const states = this.mapCompilerStates();
     const names = Object.keys(states) as unknown as Array<keyof Compilers>;
     return names.map((name) => states[name].status);
   }
 
   public processing(): void {
     // Ignore created statuses
-    const statuses = this.compilerStatuses().filter((status) => status !== 'created');
+    const statuses = this.mapCompilerStatuses().filter((status) => status !== 'created');
 
     const statusesWithoutClosed = statuses.filter((status) => status !== 'closed');
     // All compilers are closed
@@ -93,7 +93,7 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
 
   private emit(status: BuilderEvents): void {
     this.status = status;
-    this.callbacks[status].forEach((fn) => fn(this.status, this.compilerStates()));
+    this.callbacks[status].forEach((fn) => fn(this.status, this.mapCompilerStates()));
   }
 
   public on(
@@ -121,7 +121,7 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
     });
 
     Promise.all(promises).then(() => {
-      callback(this.compilerStates());
+      callback(this.mapCompilerStates());
     });
   }
 }
