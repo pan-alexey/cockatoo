@@ -50,11 +50,10 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
 
   // get state of compilers (call compiler.getState())
   private compilerStates(): { [Names in keyof Compilers]: CompilerState } {
-    const compilers = this.compilers;
-    const names = Object.keys(compilers) as unknown as Array<keyof Compilers>;
+    const names = Object.keys(this.compilers) as unknown as Array<keyof Compilers>;
 
     return names.reduce<{ [Names in keyof Compilers]: CompilerState }>((acc, name) => {
-      acc[name] = compilers[name].getState();
+      acc[name] = this.compilers[name].getState();
       return acc;
     }, {} as { [Names in keyof Compilers]: CompilerState });
   }
