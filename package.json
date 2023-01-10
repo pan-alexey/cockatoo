@@ -13,7 +13,8 @@
     ],
     "packages": [
       "config/**",
-      "common/**"
+      "common/**",
+      "e2e/**"
     ]
   },
   "dependencies": {
