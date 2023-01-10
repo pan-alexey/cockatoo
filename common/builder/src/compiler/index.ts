@@ -8,7 +8,7 @@ export type CompilerEvents = 'start' | 'progress' | 'done' | 'closed';
 export type CompilerState = {
   stats: null | webpack.Stats;
   status: CompilerStatus;
-  err: null | Error;
+  err: null | Error | Error[];
   progress: ProgressState;
 };
 
@@ -80,8 +80,9 @@ export abstract class BaseCompiler {
   }
 
   protected compilerHandler(err: Error | null = null, stats: webpack.Stats | null = null): void {
-    this.state.stats = stats;
     this.state.err = err;
+    this.state.stats = stats;
+
     this.emitDone();
   }
 

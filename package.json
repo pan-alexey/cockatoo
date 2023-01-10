@@ -13,8 +13,7 @@
     ],
     "packages": [
       "config/**",
-      "common/**",
-      "e2e/**"
+      "common/**"
     ]
   },
   "dependencies": {
@@ -23,7 +22,7 @@
   },
   "scripts": {
     "bootstrap": "yarn install && yarn run lerna:bootstrap",
-    "dev": "npm run clear && npm run bootstrap",
+    "dev": "yarn run clear && yarn run bootstrap && yarn run lerna:build",
     "🔥": "----------------------------------------",
     "lerna:bootstrap": "lerna bootstrap",
     "lerna:test": "lerna run test --parallel",
