@@ -9,7 +9,7 @@ export type ProgressStatus =
   | 'start'
   | 'compiling'
   | 'building'
-  | 'processing'
+  | 'sealing'
   | 'emit'
   | 'afterEmit'
   | 'done'
@@ -24,60 +24,94 @@ export interface ProgressState {
 
 type ProgressCallback = (progress: ProgressState) => void;
 
-export const compilerProgress = (compiler: webpack.Compiler, callback: ProgressCallback) => {
-  let startTime = Date.now();
-  // let status: ProgressStatus = 'created';
-  // let buildTime = 0;
+export class ProgressPlugin {
+  private progressEnable = true;
+  private callbacks: ProgressCallback[] = [];
+  private startTime = 0;
+  private suppress = true;
 
-  // Init new Progress Plugin
-  new webpack.ProgressPlugin((progress: number, message = '') => {
-    // update progress
-    progress = Math.round(progress * 100);
+  constructor(compiler: webpack.Compiler) {
+    console.log('this.handle', this.handle);
+    new webpack.ProgressPlugin((progress, message) => {
+      this.handle(progress, message);
+    }).apply(compiler);
+  }
+
+  private handle(progress: number, message = '') {
+    if (!this.progressEnable) return;
+
+    // done must bo after start
+    if (this.suppress && progress !== 0) {
+      return;
+    }
+
+    // start must bo after done or create
+    if (!this.suppress && progress === 0) {
+      return;
+    }
+
     let status: ProgressStatus = 'created';
-    let buildTime = 0;
+    switch (true) {
+      case progress === 0:
+        this.suppress = false;
+        this.startTime = Date.now();
+        status = 'start';
+        break;
 
-    if (progress === 0) {
-      startTime = Date.now();
-      buildTime = Date.now() - startTime;
-      status = 'start';
-    }
+      case progress < 0.1:
+        status = 'compiling';
+        break;
 
-    // STEP 1: compiling
-    if (progress > 0 && progress < 10) {
-      buildTime = Date.now() - startTime;
-      status = 'compiling';
-    }
-    // STEP 2: BUILDING
-    else if (progress >= 10 && progress <= 70) {
-      buildTime = Date.now() - startTime;
-      status = 'building';
-    }
-    // STEP 3: PROCESSING
-    else if (progress >= 70 && progress < 95) {
-      buildTime = Date.now() - startTime;
-      status = 'processing';
-    }
-    // STEP 4: EMIT
-    else if (progress >= 95 && progress < 98) {
-      buildTime = Date.now() - startTime;
-      status = 'emit';
-    }
-    // STEP 4: AFTER EMIT
-    else if (progress >= 98 && progress < 100) {
-      buildTime = Date.now() - startTime;
-      status = 'afterEmit';
-    }
-    // STEP DONE
-    else if (progress === 100) {
-      buildTime = Date.now() - startTime;
-      status = 'done';
+      case progress < 0.7:
+        status = 'building';
+        break;
+
+      case progress < 0.95:
+        status = 'sealing';
+        break;
+
+      case progress < 0.98:
+        status = 'emit';
+        break;
+
+      case progress < 1:
+        status = 'afterEmit';
+        break;
+
+      // done
+      case progress === 1:
+        this.suppress = true;
+        status = 'done';
+        break;
+      default:
+        break;
     }
 
-    callback({
-      status,
-      progress,
-      buildTime,
-      message,
-    });
-  }).apply(compiler);
-};
+    // apply callbacks
+    this.callbacks.forEach((fn) =>
+      fn({
+        status,
+        message,
+        progress,
+        buildTime: Date.now() - this.startTime,
+      }),
+    );
+  };
+
+  public isEnable() {
+    return this.isEnable;
+  }
+
+  public enable() {
+    this.progressEnable = false;
+  }
+
+  public disable() {
+    this.progressEnable = true;
+  }
+
+  public on(callback: ProgressCallback) {
+    this.callbacks.push(callback);
+    return this;
+  }
+}

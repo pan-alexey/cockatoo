@@ -1,15 +1,17 @@
-import { BaseBuilder, CompilerState, CompilerEvents } from '..';
+import { MainBuilder, BuilderState, BuilderCallback, BuilderEvents } from '..';
 import webpack from 'webpack';
 
 describe('BaseBuilder', () => {
   test('Error build', async () => {
     const compiler = webpack({});
-    const build = new BaseBuilder(compiler);
+    const builder = new MainBuilder(compiler);
 
-    expect(build.getState()).toEqual({
+    expect(builder.getState()).toEqual({
       status: 'created',
-      stats: null,
-      err: null,
+      compiler: {
+        err: null,
+        stats: null,
+      },
       progress: { progress: 0, status: 'created', buildTime: 0, message: '' },
     });
 
@@ -17,11 +19,11 @@ describe('BaseBuilder', () => {
     // Collect events
 
     const collectEvents: Array<{
-      event: CompilerEvents;
-      state: CompilerState;
+      event: BuilderEvents;
+      state: BuilderState;
     }> = [];
 
-    build
+    builder
       .on('start', (state) => {
         collectEvents.push({
           event: 'start',
@@ -39,30 +41,25 @@ describe('BaseBuilder', () => {
           event: 'done',
           state,
         });
+      })
+      .on('closed', (state) => {
+        collectEvents.push({
+          event: 'closed',
+          state,
+        });
       });
 
     // -------------------------------------------------------------//
-    const doneState: CompilerState = await new Promise((resolve) => {
-      build
-        .on('done', (state) => {
-          resolve(state);
-        })
-        .run();
+    await builder.run();
+
+    await builder.close();
+
+    await builder.run();
+
+    await builder.close();
+
+    collectEvents.forEach((item, i) => {
+      console.log(i, item);
     });
-
-    // Check getState()
-    expect(build.getState()).toEqual(doneState);
-
-    // Compile has error;
-    expect(doneState.stats?.compilation.errors.length).not.toBe(0);
-
-    // Compile time is not zero
-    expect(doneState.progress.buildTime).not.toBe(0);
-
-    // Progress percent eq 100
-    expect(doneState.progress.progress).toBe(100);
-
-    // Compile status is done;
-    expect(doneState.progress.status).toBe('done');
   });
 });

@@ -1,22 +1,20 @@
-import { BaseCompiler, CompilerState } from '../compiler';
+import { Builder } from './base';
+import type { BuilderState, BuilderStatus, BuilderEvents } from './base';
 
 export type MultiBuilderState = {
   status: BuilderStatus;
 };
 
-export type BuilderStatus = 'created' | 'start' | 'progress' | 'done' | 'closed';
-export type BuilderEvents = 'start' | 'progress' | 'done' | 'closed';
-
-export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
+export class MultiBuilder<Compilers extends Record<string, Builder>> {
   private status: BuilderStatus = 'created';
 
   private compilers: {
-    [Prop in keyof Compilers]: BaseCompiler;
+    [Prop in keyof Compilers]: Builder;
   };
 
   private callbacks: {
     [name in BuilderEvents]: Array<
-      (status: BuilderStatus, states: { [Names in keyof Compilers]: CompilerState }) => void
+      (status: BuilderStatus, states: { [Names in keyof Compilers]: BuilderState }) => void
     >;
   } = {
     start: [],
@@ -49,13 +47,13 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
   }
 
   // get state of compilers (call compiler.getState())
-  private mapCompilerStates(): { [Names in keyof Compilers]: CompilerState } {
+  private mapCompilerStates(): { [Names in keyof Compilers]: BuilderState } {
     const names = Object.keys(this.compilers) as unknown as Array<keyof Compilers>;
 
-    return names.reduce<{ [Names in keyof Compilers]: CompilerState }>((acc, name) => {
+    return names.reduce<{ [Names in keyof Compilers]: BuilderState }>((acc, name) => {
       acc[name] = this.compilers[name].getState();
       return acc;
-    }, {} as { [Names in keyof Compilers]: CompilerState });
+    }, {} as { [Names in keyof Compilers]: BuilderState });
   }
 
   private mapCompilerStatuses(): BuilderStatus[] {
@@ -98,7 +96,7 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
 
   public on(
     event: BuilderEvents,
-    fn: (status: BuilderStatus, states: { [Names in keyof Compilers]: CompilerState }) => void,
+    fn: (status: BuilderStatus, states: { [Names in keyof Compilers]: BuilderState }) => void,
   ): void {
     this.callbacks[event].push(fn);
   }
@@ -110,14 +108,14 @@ export class MultiBuilder<Compilers extends Record<string, BaseCompiler>> {
     });
   }
 
-  public close(callback?: (states: { [Names in keyof Compilers]: CompilerState }) => void): void {
+  public close(callback?: (states: { [Names in keyof Compilers]: BuilderState }) => void): void {
     if (!callback) {
       return;
     }
 
     const names = Object.keys(this.compilers) as unknown as Array<keyof Compilers>;
     const promises = names.map((name: keyof Compilers) => {
-      return new Promise((resolve) => this.compilers[name].close(resolve));
+      return this.compilers[name].close();
     });
 
     Promise.all(promises).then(() => {
