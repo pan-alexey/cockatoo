@@ -1,10 +1,10 @@
-import { MainBuilder, BuilderState, BuilderCallback, BuilderEvents } from '..';
+import { BaseBuilder, BuilderState, BuilderCallback, BuilderEvents } from '..';
 import webpack from 'webpack';
 
 describe('BaseBuilder', () => {
   test('Error build', async () => {
     const compiler = webpack({});
-    const builder = new MainBuilder(compiler);
+    const builder = new BaseBuilder(compiler);
 
     expect(builder.getState()).toEqual({
       status: 'created',
@@ -54,12 +54,14 @@ describe('BaseBuilder', () => {
 
     await builder.close();
 
-    await builder.run();
+    builder.run();
 
     await builder.close();
 
-    collectEvents.forEach((item, i) => {
-      console.log(i, item);
-    });
+    // collectEvents.forEach((item, i) => {
+    //   console.log(i, item);
+    // });
+
+    // console.log(collectEvents.filter((it) => it.event === 'done'));
   });
 });

@@ -1,4 +1,5 @@
-export type { BuilderCallback, BuilderEvents, BuilderState, BuilderStatus } from './builder/base';
-export * from './builder/main';
-export * from './builder/watch';
-export * from './builder/multi';
+export * from './components/main';
+export * from './components/watch';
+export * from './components/multi';
+export type { BuilderCallback, BuilderEvents, BuilderState, BuilderStatus } from './common/builder';
+export type { ProgressState } from './plugin/progress';

@@ -31,7 +31,6 @@ export class ProgressPlugin {
   private suppress = true;
 
   constructor(compiler: webpack.Compiler) {
-    console.log('this.handle', this.handle);
     new webpack.ProgressPlugin((progress, message) => {
       this.handle(progress, message);
     }).apply(compiler);

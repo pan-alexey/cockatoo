@@ -5,7 +5,6 @@
   "private": "true",
   "workspaces": {
     "nohoist": [
-      "**/jest",
       "**/ts-node",
       "**/@cockatoo/eslint-*",
       "**/@cockatoo/prettier-*",

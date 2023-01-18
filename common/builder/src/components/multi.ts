@@ -1,20 +1,20 @@
-import { Builder } from './base';
-import type { BuilderState, BuilderStatus, BuilderEvents } from './base';
+import { Builder } from '../common/builder';
+import type { BuilderState, BuilderStatus, BuilderEvents } from '../common/builder';
 
 export type MultiBuilderState = {
   status: BuilderStatus;
 };
 
-export class MultiBuilder<Compilers extends Record<string, Builder>> {
+export class MultiBuilder<Builders extends Record<string, Builder>> {
   private status: BuilderStatus = 'created';
 
   private compilers: {
-    [Prop in keyof Compilers]: Builder;
+    [Prop in keyof Builders]: Builder;
   };
 
   private callbacks: {
     [name in BuilderEvents]: Array<
-      (status: BuilderStatus, states: { [Names in keyof Compilers]: BuilderState }) => void
+      (status: BuilderStatus, states: { [Names in keyof Builders]: BuilderState }) => void
     >;
   } = {
     start: [],
@@ -23,15 +23,15 @@ export class MultiBuilder<Compilers extends Record<string, Builder>> {
     closed: [],
   };
 
-  constructor(compilers: Compilers) {
+  constructor(compilers: Builders) {
     this.status = 'created';
     this.compilers = compilers;
     this.listenCompilers();
   }
 
   private listenCompilers() {
-    const names = Object.keys(this.compilers) as unknown as Array<keyof Compilers>;
-    names.forEach((name: keyof Compilers) => {
+    const names = Object.keys(this.compilers) as unknown as Array<keyof Builders>;
+    names.forEach((name: keyof Builders) => {
       const compiler = this.compilers[name];
       compiler
         .on('start', () => {
@@ -47,18 +47,18 @@ export class MultiBuilder<Compilers extends Record<string, Builder>> {
   }
 
   // get state of compilers (call compiler.getState())
-  private mapCompilerStates(): { [Names in keyof Compilers]: BuilderState } {
-    const names = Object.keys(this.compilers) as unknown as Array<keyof Compilers>;
+  private mapCompilerStates(): { [Names in keyof Builders]: BuilderState } {
+    const names = Object.keys(this.compilers) as unknown as Array<keyof Builders>;
 
-    return names.reduce<{ [Names in keyof Compilers]: BuilderState }>((acc, name) => {
+    return names.reduce<{ [Names in keyof Builders]: BuilderState }>((acc, name) => {
       acc[name] = this.compilers[name].getState();
       return acc;
-    }, {} as { [Names in keyof Compilers]: BuilderState });
+    }, {} as { [Names in keyof Builders]: BuilderState });
   }
 
   private mapCompilerStatuses(): BuilderStatus[] {
     const states = this.mapCompilerStates();
-    const names = Object.keys(states) as unknown as Array<keyof Compilers>;
+    const names = Object.keys(states) as unknown as Array<keyof Builders>;
     return names.map((name) => states[name].status);
   }
 
@@ -96,30 +96,28 @@ export class MultiBuilder<Compilers extends Record<string, Builder>> {
 
   public on(
     event: BuilderEvents,
-    fn: (status: BuilderStatus, states: { [Names in keyof Compilers]: BuilderState }) => void,
+    fn: (status: BuilderStatus, states: { [Names in keyof Builders]: BuilderState }) => void,
   ): void {
     this.callbacks[event].push(fn);
   }
 
-  public run(): void {
-    const names = Object.keys(this.compilers) as unknown as Array<keyof Compilers>;
-    names.forEach((name: keyof Compilers) => {
-      this.compilers[name].run();
-    });
+  public async run(): Promise<{ [Names in keyof Builders]: BuilderState }> {
+    const names = Object.keys(this.compilers) as unknown as Array<keyof Builders>;
+    const items = await Promise.all(names.map((name: keyof Builders) => this.compilers[name].run()));
+
+    return names.reduce<{ [Names in keyof Builders]: BuilderState }>((acc, name, index) => {
+      acc[name] = items[index];
+      return acc;
+    }, {} as { [Names in keyof Builders]: BuilderState });
   }
 
-  public close(callback?: (states: { [Names in keyof Compilers]: BuilderState }) => void): void {
-    if (!callback) {
-      return;
-    }
+  public async close(): Promise<{ [Names in keyof Builders]: BuilderState }> {
+    const names = Object.keys(this.compilers) as unknown as Array<keyof Builders>;
+    const items = await Promise.all(names.map((name: keyof Builders) => this.compilers[name].close()));
 
-    const names = Object.keys(this.compilers) as unknown as Array<keyof Compilers>;
-    const promises = names.map((name: keyof Compilers) => {
-      return this.compilers[name].close();
-    });
-
-    Promise.all(promises).then(() => {
-      callback(this.mapCompilerStates());
-    });
+    return names.reduce<{ [Names in keyof Builders]: BuilderState }>((acc, name, index) => {
+      acc[name] = items[index];
+      return acc;
+    }, {} as { [Names in keyof Builders]: BuilderState });
   }
 }

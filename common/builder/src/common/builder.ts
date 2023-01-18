@@ -1,6 +1,6 @@
 import webpack from 'webpack';
-import { ProgressPlugin } from '../plugin';
-import type { ProgressState } from '../plugin';
+import { ProgressPlugin } from '../plugin/progress';
+import type { ProgressState } from '../plugin/progress';
 
 export type BuilderStatus = 'created' | 'start' | 'progress' | 'done' | 'closed';
 export type BuilderEvents = 'start' | 'progress' | 'done' | 'closed';
