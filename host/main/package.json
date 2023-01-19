@@ -1,5 +1,5 @@
 {
-  "name": "@cockatoo/host-builder",
+  "name": "@cockatoo/host-render",
   "version": "1.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
