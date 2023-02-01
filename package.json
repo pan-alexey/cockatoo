@@ -12,7 +12,8 @@
     ],
     "packages": [
       "config/**",
-      "common/**"
+      "common/**",
+      "host/**"
     ]
   },
   "dependencies": {

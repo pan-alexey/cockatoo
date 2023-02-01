@@ -1,0 +1,53 @@
+{
+  "name": "@cockatoo/host-render",
+  "version": "1.0.0",
+  "main": "./dist/server/index.js",
+  "types": "./dist/server/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "clear": "rimraf build",
+    "test": "jest --config jest.config.ts",
+    "test:coverage": "jest --config jest.config.ts  --coverage",
+    "lint": "eslint ./ --ext .js --ext .ts",
+    "lint:fix": "eslint ./ --ext .js --ext .ts --fix",
+    "dev": "yarn build:server && node index.js",
+    "build:server": "NODE_ENV=production webpack build --config webpack/webpack.server.ts"
+  },
+  "devDependencies": {
+    "@cockatoo/eslint-config": "^1.0.0",
+    "@cockatoo/prettier-config": "^1.0.0",
+    "@types/jest": "^28.1.6",
+    "@types/node": "^18.6.2",
+    "@types/react": "^18.0.15",
+    "@types/fs-extra":"^9.0.13",
+    "@types/react-dom": "^18.0.6",
+    "@types/webpack": "^5.28.0",
+    "rimraf": "^3.0.2",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.4.3",
+    "@testing-library/dom":"^8.17.1",
+    "@testing-library/jest-dom": "^5.16.5",
+    "jest": "^28.1.3",
+    "jest-environment-jsdom": "^28.1.3",
+    "ts-jest": "^28.0.7",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4",
+    "webpack-cli": "^4.10.0",
+    "clean-webpack-plugin":"^4.0.0",
+    "babel-loader":"^8.2.5",
+    "@babel/core":"^7.18.10",
+    "@babel/preset-env":"^7.18.10",
+    "@babel/preset-typescript":"^7.18.6",
+    "@babel/preset-react":"^7.18.6",
+    "webpack":"5.75.0"
+  },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  }
+}

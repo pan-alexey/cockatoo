@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "outDir": "./dist/",
+    "module": "commonjs",
+    "declaration": true,
+    "noImplicitAny": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "target": "ESNext",
+    "strict": true,
+    "removeComments": true,
+    "moduleResolution": "node",
+    "types": [
+      "node",
+      "jest",
+      "webpack/module"
+    ],
+    "baseUrl": "./src"
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/__test__/*"
+  ]
+}
