@@ -1,32 +1,32 @@
 import React from 'react';
-import { BaseModule } from './base';
+import { BaseModule, ModuleItem } from './base';
 
 const fixture = [
   {
     name: 'component1',
-    props: { test: '1' },
+    props: { data: '😀)' },
   },
   {
     name: 'component2',
-    props: { test: '1' },
+    props: { data: '😀)' },
   },
   {
     name: 'component1',
-    props: { test: '1' },
+    props: { data: '😀)' },
     children: [
       {
         name: 'component1',
-        props: { test: '1' },
+        props: { data: '😀)' },
       },
       {
         name: 'component2',
-        props: { test: '1' },
+        props: { data: '😀)' },
       },
     ],
   },
   {
     name: 'component1',
-    props: { test: '1' },
+    props: { data: '😀)' },
   },
 ];
 
@@ -39,5 +39,9 @@ export class Render {
     console.log('component1', component1);
     const component2 = await this.baseModule.render('component2', { data: '😀)' });
     console.log('component2', component2);
+
+    const promises = fixture.map((moduleItem) => {
+      
+    })
   }
 }
