@@ -35,13 +35,14 @@ export class Render {
 
   public async render() {
     console.log('render');
-    const component1 = await this.baseModule.render('component1', {});
-    console.log('component1', component1);
-    const component2 = await this.baseModule.render('component2', { data: '😀)' });
-    console.log('component2', component2);
+    const components = [
+      this.baseModule.render('component2', { data: '😀' }),
+      this.baseModule.render('component1', {}),
+      this.baseModule.render('component2', { data: '🤪' }),
+    ];
 
-    const promises = fixture.map((moduleItem) => {
-      
-    })
+    const results = await Promise.all(components);
+
+    console.log(results);
   }
 }

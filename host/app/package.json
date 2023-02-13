@@ -1,6 +1,8 @@
 {
-  "name": "@cockatoo/host-render",
+  "name": "@cockatoo/host-app",
   "version": "1.0.0",
+  "author": "Pan Alexey <pan-alexey@live.com>",
+  "license": "MIT",
   "main": "./dist/server/index.js",
   "types": "./dist/server/index.d.ts",
   "files": [

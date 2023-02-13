@@ -1,6 +1,3 @@
-// export interface ModuleRegistryInterface {
-// }
-
 export interface RegistryModule {
   name: string;
 }

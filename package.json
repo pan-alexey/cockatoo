@@ -8,7 +8,7 @@
       "**/ts-node",
       "**/@cockatoo/eslint-*",
       "**/@cockatoo/prettier-*",
-      "**/@cockatoo/core-render",
+      "**/@cockatoo/host-app",
       "**/react-dom"
     ],
     "packages": [
