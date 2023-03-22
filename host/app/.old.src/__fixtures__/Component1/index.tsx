@@ -2,7 +2,12 @@ import React from 'react';
 
 const LazyComponent = React.lazy(() => import('./lazy'));
 
-const Component1: React.FC = () => {
+export interface ComponentProps {
+  data?: unknown;
+  children?: React.ReactNode;
+}
+
+const Component1: React.FC<ComponentProps> = () => {
   return (
     <div>
       Component1{' '}

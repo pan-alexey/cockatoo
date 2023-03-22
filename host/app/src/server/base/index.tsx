@@ -1,40 +1,64 @@
 import React from 'react';
+import { RemoteWidget } from '../../types';
+import { WidgetContext } from '../../types';
+import { getWidgetInfo } from '../../common/widget/getInfo';
+import { getComponentWidget } from './widgets';
+import { makeContext } from './context';
 import { renderComponent } from '../render';
-import { Registry } from '../registry';
+import { Context as RootContext } from '../../common/context/root';
 
-import Component1 from '../../__fixtures__/Component1';
-import Component2 from '../../__fixtures__/Component2';
+const rootContext: WidgetContext = {
+  provider: RootContext.Provider,
+  hooks: [RootContext.useContext],
+};
 
-export interface ModuleItem {
-  name: string;
-  props: unknown;
-  elementType?: 'div' | 'span';
-}
+export const renderWidgets = async (widgets: RemoteWidget[], context: WidgetContext): Promise<string> => {
+  let result: string[] = [];
 
-export class BaseModule {
-  private registry = new Registry();
-  constructor() {
-    this.registry.loadModule('component1', Component1);
-    this.registry.loadModule('component2', Component2);
-    console.log('init BaseModule');
+  // TODO promise all
+  for (let i = 0; i < widgets.length; i++) {
+    const widget = widgets[i];
+    const widgetInfo = getWidgetInfo(widget.name);
+    if (!widgetInfo) continue;
+
+    if (widgetInfo.type === 'widget') {
+      const widgetName = widgetInfo.name;
+
+      const children = widget.children ? await renderWidgets(widget.children, context) : '';
+
+      const item = {
+        widgetName,
+        context,
+        props: widget.props,
+        children: <div dangerouslySetInnerHTML={{ __html: children }} />,
+      };
+
+      // add context to widget in this;
+      const html = await renderComponent(getComponentWidget(item));
+      result.push(html);
+    }
+
+    // Make new context
+    if (widgetInfo.type === 'context') {
+      const contextName = widgetInfo.name;
+
+      const newContext = makeContext({
+        parentContext: context,
+        currentContext: {
+          name: contextName,
+          props: widget.props,
+        },
+      });
+
+      const newResult: string = widget.children ? await renderWidgets(widget.children, newContext) : '';
+      result = [...result, newResult];
+    }
   }
 
-  public async renderSimple({ name, props }: ModuleItem): Promise<React.ReactElement> {
-    const Component = (await this.registry.getModule(name)) as React.ElementType;
+  // todo stream render widget
+  return result.join('');
+};
 
-    return React.createElement('div', {}, <Component props={props} />);
-  }
-
-  public async renderGraceful({ name, props }: ModuleItem): Promise<React.ReactElement> {
-    const Component = (await this.registry.getModule(name)) as React.ElementType;
-
-    const __html = await renderComponent(<Component props={props} />);
-    return React.createElement('div', { dangerouslySetInnerHTML: { __html } });
-  }
-
-  public async render(name: string, props: unknown): Promise<string> {
-    const Element = await this.renderGraceful({ name, props });
-
-    return await renderComponent(Element);
-  }
-}
+export const renderApp = (widgets: RemoteWidget[]) => {
+  return renderWidgets(widgets, rootContext);
+};
