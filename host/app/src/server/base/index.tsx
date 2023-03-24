@@ -12,51 +12,51 @@ const rootContext: WidgetContext = {
   hooks: [RootContext.useContext],
 };
 
-export const renderWidgets = async (widgets: RemoteWidget[], context: WidgetContext): Promise<string> => {
-  let result: string[] = [];
+export const renderWidget = async (widget: RemoteWidget, context: WidgetContext): Promise<string> => {
+  const widgetInfo = getWidgetInfo(widget.name);
+  if (!widgetInfo) {
+    return '';
+  };
 
-  // TODO promise all
-  for (let i = 0; i < widgets.length; i++) {
-    const widget = widgets[i];
-    const widgetInfo = getWidgetInfo(widget.name);
-    if (!widgetInfo) continue;
+  if (widgetInfo.type === 'widget') {
+    const widgetName = widgetInfo.name;
 
-    if (widgetInfo.type === 'widget') {
-      const widgetName = widgetInfo.name;
+    const children = widget.children ? await renderWidgets(widget.children, context) : '';
 
-      const children = widget.children ? await renderWidgets(widget.children, context) : '';
+    const item = {
+      widgetName,
+      context,
+      props: widget.props,
+      children: <div dangerouslySetInnerHTML={{ __html: children }} />,
+    };
 
-      const item = {
-        widgetName,
-        context,
-        props: widget.props,
-        children: <div dangerouslySetInnerHTML={{ __html: children }} />,
-      };
-
-      // add context to widget in this;
-      const html = await renderComponent(getComponentWidget(item));
-      result.push(html);
-    }
-
-    // Make new context
-    if (widgetInfo.type === 'context') {
-      const contextName = widgetInfo.name;
-
-      const newContext = makeContext({
-        parentContext: context,
-        currentContext: {
-          name: contextName,
-          props: widget.props,
-        },
-      });
-
-      const newResult: string = widget.children ? await renderWidgets(widget.children, newContext) : '';
-      result = [...result, newResult];
-    }
+    // add context to widget in this;
+    const html = await renderComponent(getComponentWidget(item));
+    return html;
   }
 
-  // todo stream render widget
-  return result.join('');
+  // Make new context
+  if (widgetInfo.type === 'context') {
+    const contextName = widgetInfo.name;
+
+    const newContext = makeContext({
+      parentContext: context,
+      currentContext: {
+        name: contextName,
+        props: widget.props,
+      },
+    });
+
+    const newResult: string = widget.children ? await renderWidgets(widget.children, newContext) : '';
+    return newResult;
+  }
+
+  return '';
+};
+
+export const renderWidgets = async (widgets: RemoteWidget[], context: WidgetContext): Promise<string> => {
+  const promises: Array<string> = await Promise.all(widgets.map((widget) => renderWidget(widget, context)));
+  return promises.join('');
 };
 
 export const renderApp = (widgets: RemoteWidget[]) => {

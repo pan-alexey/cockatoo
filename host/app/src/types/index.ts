@@ -21,5 +21,6 @@ export interface WidgetContext {
 export interface RemoteWidget {
   name: string; // nameContext - component context
   props: Record<string, unknown>;
+  important?: boolean;
   children?: RemoteWidget[];
 }

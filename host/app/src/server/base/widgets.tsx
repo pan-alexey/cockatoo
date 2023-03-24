@@ -15,7 +15,6 @@ export const getComponentWidget = (widgetProps: GetComponentWidgetProps): React.
 
   const Provider = context.provider;
   const useContext = context.hooks;
-  console.log('getComponentWidget', context);
 
   if (Component) {
     return (

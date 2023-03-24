@@ -1,7 +1,7 @@
 import type { RemoteWidget } from '../types';
 
 export const data: RemoteWidget[] = [
-  { name: 'widget.widget4', props: {} },
+  { name: 'widget.widget4', props: {}, important: true },
   { name: 'widget.widget1', props: { test: 1 } },
   {
     name: 'context.context1',
