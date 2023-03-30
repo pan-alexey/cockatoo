@@ -1,6 +1,8 @@
 import React from 'react';
 import { WidgetContext } from '../../types';
 import { components } from '../__fixtures__/index';
+import { loadComponent } from '../regestry/component/module';
+
 export interface GetComponentWidgetProps {
   widgetName: string;
   context: WidgetContext;
@@ -8,10 +10,16 @@ export interface GetComponentWidgetProps {
   props?: Record<string, unknown>;
 }
 
-export const getComponentWidget = (widgetProps: GetComponentWidgetProps): React.ReactElement => {
+export const getComponentWidget = async (widgetProps: GetComponentWidgetProps): Promise<React.ReactElement> => {
   const { widgetName, children = null, context, props = {} } = widgetProps;
 
-  const Component = components[widgetName]; // TODO: use registry;
+  let Component = null;
+
+  if (widgetName === 'widget2') {
+    Component = await loadComponent('');
+  } else {
+    Component = components[widgetName]; // TODO: use registry;
+  }
 
   const Provider = context.provider;
   const useContext = context.hooks;

@@ -8,13 +8,15 @@
       "**/ts-node",
       "**/@cockatoo/eslint-*",
       "**/@cockatoo/prettier-*",
+      "**/@cockatoo/common-*",
       "**/@cockatoo/host-app",
       "**/react-dom"
     ],
     "packages": [
       "config/**",
       "common/**",
-      "host/**"
+      "host/**",
+      "widget/**"
     ]
   },
   "dependencies": {
@@ -27,7 +29,10 @@
     "🔥": "----------------------------------------",
     "lerna:bootstrap": "lerna bootstrap",
     "lerna:test": "lerna run test --parallel",
-    "lerna:build": "lerna run build --parallel",
+    "🔥🔥": "----------------------------------------",
+    "lerna:build": "npm run lerna:build-common && npm run lerna:build-widget",
+    "lerna:build-common": "lerna run build --parallel --scope @cockatoo/common-*",
+    "lerna:build-widget": "lerna run build --parallel --scope @cockatoo/widget-*",
     "🧹": "----------------------------------------",
     "clear": "yarn run clear:dist & yarn run clear:yarn.lock & yarn run clear:coverage & yarn run clear:node_modules",
     "clear:node_modules": "rimraf ./**/node_modules",

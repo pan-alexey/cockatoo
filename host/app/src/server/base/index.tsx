@@ -31,7 +31,8 @@ export const renderWidget = async (widget: RemoteWidget, context: WidgetContext)
     };
 
     // add context to widget in this;
-    const html = await renderComponent(getComponentWidget(item));
+    const component = await getComponentWidget(item);
+    const html = await renderComponent(component);
     return html;
   }
 
