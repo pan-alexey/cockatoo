@@ -7,7 +7,7 @@ export type Context1Type = {
 };
 const Context1 = React.createContext<Context1Type | null>(null);
 
-const Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const Provider: React.FC<{ children: React.ReactNode; props?: unknown }> = ({ children, props }) => {
   const [state, setState] = React.useState<string>('context1');
 
   const setValue = (newValue: string) => {

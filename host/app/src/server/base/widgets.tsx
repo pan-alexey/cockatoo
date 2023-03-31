@@ -15,8 +15,10 @@ export const getComponentWidget = async (widgetProps: GetComponentWidgetProps): 
 
   let Component = null;
 
-  if (widgetName === 'widget2') {
-    Component = await loadComponent('');
+  if (widgetName === 'widget1') {
+    Component = await loadComponent('/Users/agpan/Github-new/cockatoo/widget/widget-1/dist/server/module.js');
+  } else if (widgetName === 'widget2') {
+    Component = await loadComponent('/Users/agpan/Github-new/cockatoo/widget/widget-2/dist/server/module.js');
   } else {
     Component = components[widgetName]; // TODO: use registry;
   }

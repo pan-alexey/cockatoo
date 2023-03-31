@@ -14,9 +14,10 @@ const rootContext: WidgetContext = {
 
 export const renderWidget = async (widget: RemoteWidget, context: WidgetContext): Promise<string> => {
   const widgetInfo = getWidgetInfo(widget.name);
+
   if (!widgetInfo) {
     return '';
-  };
+  }
 
   if (widgetInfo.type === 'widget') {
     const widgetName = widgetInfo.name;

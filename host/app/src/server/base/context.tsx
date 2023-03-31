@@ -14,11 +14,12 @@ export const makeContext = ({ parentContext, currentContext }: MakeContextProps)
   const ParentProvider = parentContext.provider;
 
   const Component = contexts[currentContext.name]; // TODO: use registry;
+  const props = currentContext.props;
 
   const provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
       <ParentProvider>
-        <Component.Provider>{children}</Component.Provider>
+        <Component.Provider props={props}>{children}</Component.Provider>
       </ParentProvider>
     );
   };
