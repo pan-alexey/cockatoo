@@ -17,7 +17,6 @@ const remoteWidget = async () => {
     const module = await container.get('widget');
     return module();
   }
-
 }
 
 const Image = React.lazy(() => remoteWidget());

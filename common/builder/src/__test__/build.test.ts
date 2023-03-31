@@ -1,4 +1,4 @@
-import { BaseBuilder, BuilderState, BuilderCallback, BuilderEvents } from '..';
+import { BaseBuilder, BuilderState, BuilderEvents } from '../';
 import webpack from 'webpack';
 
 describe('BaseBuilder', () => {
