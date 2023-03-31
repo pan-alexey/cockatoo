@@ -14,7 +14,7 @@ export default (): Configuration => {
   const config: Configuration = {
     target: "web",
     devtool: "source-map",
-    mode: "production", //"production",
+    mode: "production",
     entry: {
       index: path.resolve("./src/client/index.ts"),
       // shared modules?

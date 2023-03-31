@@ -9,18 +9,19 @@ const packagePath = process.cwd();
 
 export default (): Configuration => {
   const config: Configuration = {
-    target: "node",
+    target: "web",
     mode: "development",
     devtool: 'source-map',
     entry: {
       index: path.resolve(packagePath, "./src/bootstrap.ts")
     },
     output: {
+      chunkLoadingGlobal: 'webpack_widget_chunks',
+      uniqueName: widgetName,
       publicPath: 'auto',
-      libraryTarget: "commonjs-module",
+      path: path.resolve(packagePath, 'dist/client'),
       filename: `index.js`,
       chunkFilename: "./chunks/[name]-[contenthash].js",
-      path: path.resolve(packagePath, "dist/server"),
     },
     resolve: {
       extensions: [".js", ".ts", ".tsx", ".css"],
@@ -95,7 +96,7 @@ export default (): Configuration => {
       }),
       new ModuleFederationPlugin({
         name: widgetName,
-        library: { type: "commonjs-module" },
+        library: {type: 'window', name: ['widgets', widgetName]},
         filename: "module.js",
         exposes: { widget: ["./src/index"] },
         shared: [

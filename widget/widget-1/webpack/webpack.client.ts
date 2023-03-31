@@ -9,18 +9,20 @@ const packagePath = process.cwd();
 
 export default (): Configuration => {
   const config: Configuration = {
-    target: "node",
+    target: "web",
     mode: "development",
     devtool: 'source-map',
     entry: {
       index: path.resolve(packagePath, "./src/bootstrap.ts")
     },
     output: {
+      chunkLoadingGlobal: 'webpack_widget_chunks',
+      uniqueName: widgetName,
       publicPath: 'auto',
-      libraryTarget: "commonjs-module",
+      path: path.resolve(packagePath, 'dist/client'),
       filename: `index.js`,
       chunkFilename: "./chunks/[name]-[contenthash].js",
-      path: path.resolve(packagePath, "dist/server"),
+      clean: true
     },
     resolve: {
       extensions: [".js", ".ts", ".tsx", ".css"],
@@ -30,31 +32,31 @@ export default (): Configuration => {
     },
     optimization: {
       runtimeChunk: false,
-      // splitChunks: {
-      //   chunks: 'all',
-      //   maxInitialRequests: Infinity,
-      //   minSize: 0,
-      //   cacheGroups: {
-      //     vendor: {
-      //       test: /[\\/]node_modules[\\/]/,
-      //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //       // @ts-ignore
-      //       name(module) {
-      //         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //         // @ts-ignore
-      //         const packageName = module.context.match(
-      //           /[\\/]node_modules[\\/](.*?)([\\/]|$)/,
-      //         )[1];
-      //         return `vendor/${packageName}`;
-      //       },
-      //     },
-      //   },
-      // },
       splitChunks: {
+        chunks: 'all',
+        maxInitialRequests: Infinity,
+        minSize: 0,
         cacheGroups: {
-          default: false
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            name(module) {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              const packageName = module.context.match(
+                /[\\/]node_modules[\\/](.*?)([\\/]|$)/,
+              )[1];
+              return `vendor/${packageName}`;
+            },
+          },
         },
       },
+      // splitChunks: {
+      //   cacheGroups: {
+      //     default: false
+      //   },
+      // },
     },
     module: {
       rules: [
@@ -90,22 +92,16 @@ export default (): Configuration => {
     },
     plugins: [
       // new CleanWebpackPlugin(), ???
-      new webpack.optimize.LimitChunkCountPlugin({
-        maxChunks: 1,
-      }),
       new ModuleFederationPlugin({
         name: widgetName,
-        library: { type: "commonjs-module" },
+        library: {type: 'window', name: ['widgets', widgetName]},
         filename: "module.js",
         exposes: { widget: ["./src/index"] },
-        shared: [
-          "react", "react-dom"
-          // {
-          //   react: { singleton: true },
-          //   "react-dom": { singleton: true },
-          //   moment: { singleton: true },
-          // },
-        ],
+        shared: {
+          react: { singleton: true },
+          'react-dom': { singleton: true },
+          moment: { singleton: true },
+        },
       }),
       // @ts-ignore
       new CleanWebpackPlugin()

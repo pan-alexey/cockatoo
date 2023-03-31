@@ -6,6 +6,7 @@
   "workspaces": {
     "nohoist": [
       "**/ts-node",
+      "**/webpack",
       "**/@cockatoo/eslint-*",
       "**/@cockatoo/prettier-*",
       "**/@cockatoo/common-*",
