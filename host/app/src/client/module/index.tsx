@@ -7,8 +7,5 @@ export const RenderWidget: React.FC = () => {
 
 export const getWidget1 = async () => {
   const Element = await loadModule('http://127.0.0.1:8080/client/module.js', 'widget1');
-
-  console.log('Element', Element);
-
   return Element;
 };

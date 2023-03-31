@@ -6,7 +6,7 @@ interface ComponentProps {
   children?: React.ReactNode;
 }
 const name = 'lazy';
-const LazyComponent = React.lazy(() => import('./components/lazy'));
+const LazyComponent = React.lazy(() => import('./components/' + name));
 
 const Component: React.FC<ComponentProps> = ({ data, children, contexts }) => {
   return (

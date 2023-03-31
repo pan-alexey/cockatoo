@@ -21,8 +21,8 @@ export const plugins = (appName: string, isDev: boolean): WebpackPluginInstance[
     new ModuleFederationPlugin({
       name: appName, // build name by package.json
       shared: {
-        react: { singleton: true, requiredVersion: '18.2.0' }, // to external
-        'react-dom': { singleton: true, requiredVersion: '18.2.0' }, // to external
+        react: { singleton: true, requiredVersion: '18.2.0', eager: true }, // to external
+        'react-dom': { singleton: true, requiredVersion: '18.2.0', eager: true }, // to external
       },
     }),
   ];

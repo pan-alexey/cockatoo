@@ -16,7 +16,6 @@ export const loadModule = async (url: string, scope: string, module = 'widget'):
 
     await container.init(__webpack_share_scopes__.default);
     const factory = await container.get(module);
-    console.log('factory', factory());
     return factory().default as React.ElementType;
   } catch (error) {
     console.error('Error loading module:', error);
