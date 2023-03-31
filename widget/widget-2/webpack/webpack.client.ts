@@ -16,12 +16,13 @@ export default (): Configuration => {
       index: path.resolve(packagePath, "./src/bootstrap.ts")
     },
     output: {
-      chunkLoadingGlobal: 'webpack_widget_chunks',
+      // chunkLoadingGlobal: `webpack_widget_chunks_${widgetName}`,
       uniqueName: widgetName,
       publicPath: 'auto',
       path: path.resolve(packagePath, 'dist/client'),
-      filename: `index.js`,
+      filename: `[name].js`,
       chunkFilename: "./chunks/[name]-[contenthash].js",
+      clean: true
     },
     resolve: {
       extensions: [".js", ".ts", ".tsx", ".css"],
@@ -31,31 +32,31 @@ export default (): Configuration => {
     },
     optimization: {
       runtimeChunk: false,
-      // splitChunks: {
-      //   chunks: 'all',
-      //   maxInitialRequests: Infinity,
-      //   minSize: 0,
-      //   cacheGroups: {
-      //     vendor: {
-      //       test: /[\\/]node_modules[\\/]/,
-      //       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //       // @ts-ignore
-      //       name(module) {
-      //         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //         // @ts-ignore
-      //         const packageName = module.context.match(
-      //           /[\\/]node_modules[\\/](.*?)([\\/]|$)/,
-      //         )[1];
-      //         return `vendor/${packageName}`;
-      //       },
-      //     },
-      //   },
-      // },
       splitChunks: {
+        chunks: 'all',
+        maxInitialRequests: Infinity,
+        minSize: 0,
         cacheGroups: {
-          default: false
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            name(module) {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              const packageName = module.context.match(
+                /[\\/]node_modules[\\/](.*?)([\\/]|$)/,
+              )[1];
+              return `vendor/${packageName}`;
+            },
+          },
         },
       },
+      // splitChunks: {
+      //   cacheGroups: {
+      //     default: false
+      //   },
+      // },
     },
     module: {
       rules: [
@@ -90,10 +91,6 @@ export default (): Configuration => {
       ],
     },
     plugins: [
-      // new CleanWebpackPlugin(), ???
-      new webpack.optimize.LimitChunkCountPlugin({
-        maxChunks: 1,
-      }),
       new ModuleFederationPlugin({
         name: widgetName,
         library: {type: 'window', name: ['widgets', widgetName]},

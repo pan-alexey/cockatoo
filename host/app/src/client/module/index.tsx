@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import { loadModule } from './utils/loadModule';
 
 export const RenderWidget: React.FC = () => {
@@ -6,6 +6,11 @@ export const RenderWidget: React.FC = () => {
 };
 
 export const getWidget1 = async () => {
-  const Element = await loadModule('http://127.0.0.1:8080/client/module.js', 'widget1');
+  const Element = await loadModule('http://127.0.0.1:8081/client/module.js', 'widget1');
+  return Element;
+};
+
+export const getWidget2 = async () => {
+  const Element = await loadModule('http://127.0.0.1:8082/client/module.js', 'widget2');
   return Element;
 };

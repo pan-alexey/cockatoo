@@ -3,8 +3,9 @@
   "version": "1.0.0-dev",
   "private": true,
   "scripts": {
+    "dev": "yarn run build:client && yarn run build:server && npm run server",
     "tar": "tar -C dist -czvf dist.tgz ./",
-    "dev": "yarn run build:client && yarn run build:server",
+    "server": "http-server ./dist -p 8082",
     "build:client": "NODE_ENV=production webpack build --config webpack/webpack.client.ts",
     "build:server": "NODE_ENV=production webpack build --config webpack/webpack.server.ts",
     "lint": "eslint ./ --ext .ts,.tsx,.js,.jsx",
@@ -15,6 +16,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "http-server": "^14.1.1",
     "@types/jest": "^28.1.6",
     "@types/node": "^18.6.2",
     "@types/react": "^18.0.15",

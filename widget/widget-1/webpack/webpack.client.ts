@@ -16,11 +16,11 @@ export default (): Configuration => {
       index: path.resolve(packagePath, "./src/bootstrap.ts")
     },
     output: {
-      chunkLoadingGlobal: 'webpack_widget_chunks',
+      // chunkLoadingGlobal: `webpack_widget_chunks_${widgetName}`,
       uniqueName: widgetName,
       publicPath: 'auto',
       path: path.resolve(packagePath, 'dist/client'),
-      filename: `index.js`,
+      filename: `[name].js`,
       chunkFilename: "./chunks/[name]-[contenthash].js",
       clean: true
     },
@@ -91,7 +91,6 @@ export default (): Configuration => {
       ],
     },
     plugins: [
-      // new CleanWebpackPlugin(), ???
       new ModuleFederationPlugin({
         name: widgetName,
         library: {type: 'window', name: ['widgets', widgetName]},
